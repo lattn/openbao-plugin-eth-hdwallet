@@ -2,8 +2,8 @@ name: Build and release binaries
 
 on:
   push:
-    branches:
-      - "**"
+    tags:
+      - "v*"
 
 permissions:
   contents: write
@@ -39,15 +39,15 @@ jobs:
             openbao-plugin-eth-hdwallet-linux-arm64) \
             | grep -v '\.sha256$' > dist/checksums.txt
 
-      - name: Publish release for commit
+      - name: Publish release for version tag
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "build-${{ github.sha }}"
+          tag_name: "${{ github.ref_name }}"
           target_commitish: "${{ github.sha }}"
-          name: "Build ${{ github.sha }}"
+          name: "${{ github.ref_name }}"
           body: |
-            Automated Linux binaries for commit `${{ github.sha }}`.
+            Automated Linux binaries for version `${{ github.ref_name }}`
+            (commit `${{ github.sha }}`).
 
             Architectures: `amd64`, `arm64`
-          prerelease: true
           files: dist/*
