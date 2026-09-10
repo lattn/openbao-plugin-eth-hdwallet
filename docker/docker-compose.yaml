@@ -1,0 +1,14 @@
+services:
+  openbao:
+    image: openbao/openbao:latest
+    environment:
+      BAO_ADDR: 'http://127.0.0.1:8200'
+    volumes:
+      - ./config:/openbao/config:ro
+      - ./data:/openbao/data:rw
+      - ./logs:/openbao/logs:rw
+      - ./plugins:/openbao/plugins:r
+    cap_add:
+      - IPC_LOCK
+    command: server
+    restart: unless-stopped
