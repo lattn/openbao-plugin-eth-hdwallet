@@ -1,0 +1,53 @@
+name: Build and release binaries
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build Linux binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          for arch in amd64 arm64; do
+            name="openbao-plugin-eth-hdwallet-linux-${arch}"
+            GOOS=linux GOARCH="${arch}" CGO_ENABLED=0 \
+              go build -trimpath -ldflags="-s -w" -o "dist/${name}" .
+            (cd dist && sha256sum "${name}") > "dist/${name}.sha256"
+          done
+
+          (cd dist && sha256sum \
+            openbao-plugin-eth-hdwallet-linux-amd64 \
+            openbao-plugin-eth-hdwallet-linux-arm64) \
+            | grep -v '\.sha256$' > dist/checksums.txt
+
+      - name: Publish release for commit
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "build-${{ github.sha }}"
+          target_commitish: "${{ github.sha }}"
+          name: "Build ${{ github.sha }}"
+          body: |
+            Automated Linux binaries for commit `${{ github.sha }}`.
+
+            Architectures: `amd64`, `arm64`
+          prerelease: true
+          files: dist/*
