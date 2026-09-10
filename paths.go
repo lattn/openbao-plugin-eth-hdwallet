@@ -64,8 +64,8 @@ func pathSignTx(b *ethBackend) *framework.Path {
 			"to":                       {Type: framework.TypeString, Description: "Recipient Address"},
 			"value":                    {Type: framework.TypeString, Description: "Value in Wei"},
 			"gas_limit":                {Type: framework.TypeInt64, Description: "Gas Limit"},
-			"max_fee_per_gas":          {Type: framework.TypeString, Description: "EIP-1559 Max Fee"},
-			"max_priority_fee_per_gas": {Type: framework.TypeString, Description: "EIP-1559 Priority Fee"},
+			"max_fee_per_gas":          {Type: framework.TypeString, Description: "EIP-1559 maximum fee per gas, in wei (maxFeePerGas)"},
+			"max_priority_fee_per_gas": {Type: framework.TypeString, Description: "EIP-1559 maximum priority fee per gas, in wei (maxPriorityFeePerGas)"},
 			"data":                     {Type: framework.TypeString, Description: "Transaction Hex Data"},
 		},
 		Operations: map[logical.Operation]framework.OperationHandler{
