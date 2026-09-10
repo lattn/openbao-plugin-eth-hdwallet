@@ -47,9 +47,6 @@ func pathAddress(b *ethBackend) *framework.Path {
 			logical.ReadOperation: &framework.PathOperation{
 				Callback: b.pathAddressRead,
 			},
-			logical.UpdateOperation: &framework.PathOperation{
-				Callback: b.pathAddressRead,
-			},
 		},
 	}
 }
@@ -135,7 +132,7 @@ func (b *ethBackend) pathAddressRead(ctx context.Context, req *logical.Request, 
 	}
 
 	// Read the mnemonic from OpenBao's encrypted storage.
-	entry, err := req.Storage.Get(ctx, "config")
+	entry, err := req.Storage.Get(ctx, "root-key")
 	if err != nil || entry == nil {
 		return logical.ErrorResponse("plugin unconfigured. Please run /config first."), nil
 	}
@@ -164,7 +161,7 @@ func (b *ethBackend) pathAddressRead(ctx context.Context, req *logical.Request, 
 
 func (b *ethBackend) pathSignTxWrite(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	// 1. Retrieve the stored mnemonic.
-	entry, err := req.Storage.Get(ctx, "config")
+	entry, err := req.Storage.Get(ctx, "root-key")
 	if err != nil || entry == nil {
 		return logical.ErrorResponse("plugin not configured with mnemonic"), nil
 	}
